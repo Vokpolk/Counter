@@ -18,12 +18,18 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        historyInput.text = "История изменений:\n"
-        updateCounter()
-        
         data.dateStyle = .short
         data.timeStyle = .short
         data.locale = Locale(identifier: "ru_RU")
+        
+        if let _ = UserDefaults.standard.string(forKey: "historyInput") {
+            historyInput.text = UserDefaults.standard.string(forKey: "historyInput")
+        } else {
+            historyInput.text = "История изменений:\n"
+        }
+        textViewToBottom()
+        counter = UInt(UserDefaults.standard.integer(forKey: "counter"))
+        updateCounter()
     }
     
     private func textViewToBottom() {
@@ -31,6 +37,11 @@ class ViewController: UIViewController {
     }
     private func updateCounter() {
         counterLabel.text = String(counter)
+        UserDefaults.standard.set(counter, forKey: "counter")
+    }
+    private func updateText() {
+        UserDefaults.standard.set(historyInput.text, forKey: "historyInput")
+        textViewToBottom()
     }
     private func currentDateAndTime() -> String {
         let date = Date()
@@ -40,7 +51,7 @@ class ViewController: UIViewController {
     @IBAction private func incrementTap(_ sender: Any) {
         counter += 1
         historyInput.text.append("\(currentDateAndTime()): значение изменено на +1\n")
-        textViewToBottom()
+        updateText()
         updateCounter()
     }
     @IBAction private func decrementTap(_ sender: Any) {
@@ -50,13 +61,13 @@ class ViewController: UIViewController {
         } else {
             historyInput.text.append("\(currentDateAndTime()): попытка уменьшить значение счетчика ниже 0\n")
         }
-        textViewToBottom()
+        updateText()
         updateCounter()
     }
     @IBAction private func resetCounterTap(_ sender: Any) {
         counter = 0
         historyInput.text.append("\(currentDateAndTime()): значение сброшено\n")
-        textViewToBottom()
+        updateText()
         updateCounter()
     }
 }
